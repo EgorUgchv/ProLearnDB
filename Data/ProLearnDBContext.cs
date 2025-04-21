@@ -3,17 +3,19 @@ using ProLearnDB.Models;
 
 namespace ProLearnDB.Data;
 
-internal class ProLearnDBContext:DbContext
+public class ProLearnDbContext:DbContext
 {
     protected readonly IConfiguration Configuration;
 
-    public ProLearnDBContext(IConfiguration configuration)
+    public ProLearnDbContext(IConfiguration configuration)
     {
         Configuration = configuration;
     }
     
     public DbSet<TestTitle> TestTitles { get; set; }
     public DbSet<Question> Questions { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<UserProgress> UserProgresses { get; set; }
     public DbSet<CorrectAnswer> CorrectAnswers { get; set; }
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
    {

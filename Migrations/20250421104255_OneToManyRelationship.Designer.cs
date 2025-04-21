@@ -10,7 +10,7 @@ using ProLearnDB.Data;
 
 namespace ProLearnDB.Migrations
 {
-    [DbContext(typeof(ProLearnDBContext))]
+    [DbContext(typeof(ProLearnDbContext))]
     [Migration("20250421104255_OneToManyRelationship")]
     partial class OneToManyRelationship
     {
