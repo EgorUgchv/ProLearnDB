@@ -1,4 +1,6 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
 using ProLearnDB.Models;
 
@@ -9,18 +11,38 @@ namespace ProLearnDB.Controller;
 public class QuestionController : Microsoft.AspNetCore.Mvc.Controller
 {
     private readonly IQuestionRepository _questionRepository;
-    public QuestionController(IQuestionRepository questionRepository)
+    private readonly IMapper _mapper;
+    public QuestionController(IQuestionRepository questionRepository, IMapper mapper)
     {
         _questionRepository = questionRepository;
+        _mapper = mapper;
     }
 
+    /// <summary>
+    /// Все вопросы в тестах с верными ответами
+    /// </summary>
+    /// <returns>Все вопросы с верными ответами</returns>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<Question>))]
     public IActionResult GetQuestionsWithCorrectAnswers()
     {
-        var questions = _questionRepository.GetQuestionsWithCorrectAnswers();
+        var questions = _mapper.Map<List<QuestionDto>>( _questionRepository.GetQuestionsWithCorrectAnswers());
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         return Ok(questions);
+    }
+
+    [HttpGet("{questionId}")]
+    [ProducesResponseType(200, Type = typeof(Question))]
+    [ProducesResponseType(400)]
+    public IActionResult GetQuestion(int questionId)
+    {
+        if (!_questionRepository.QuestionExists(questionId))
+            return NotFound();
+        var question =_mapper.Map<QuestionDto>(_questionRepository.GetQuestion(questionId)) ;
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        return Ok(question);
     }
 }

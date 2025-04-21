@@ -6,7 +6,8 @@ public class CorrectAnswer
 {
     public int CorrectAnswerId { get; set; }
 
-    public string Answer { get; set; }
+    [MaxLength(500)]
+    public string? Answer { get; set; }
     
     public ICollection<Question> Questions { get; set; }
 }

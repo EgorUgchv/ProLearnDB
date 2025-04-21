@@ -22,8 +22,19 @@ public class QuestionRepository : IQuestionRepository
         return _context.Questions.OrderBy(p => p.QuestionId).ToList();
     }
 
+    /// <summary>
+    /// Вопрос по id 
+    /// </summary>
+    /// <param name="questionId">Id вопроса</param>
+    /// <returns>Вопрос, соответствующий переданному id</returns>
     public Question? GetQuestion(int questionId)
     {
-        return _context.Questions.FirstOrDefault(p => p.QuestionId == questionId);
+        return _context.Questions.FirstOrDefault(q => q.QuestionId == questionId);
     }
+
+    public bool QuestionExists(int questionId)
+    {
+        return _context.Questions.Any(q => q.QuestionId == questionId);
+    }
+
 }
