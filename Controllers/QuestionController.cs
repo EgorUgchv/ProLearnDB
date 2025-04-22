@@ -4,11 +4,11 @@ using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
 using ProLearnDB.Models;
 
-namespace ProLearnDB.Controller;
+namespace ProLearnDB.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class QuestionController : Microsoft.AspNetCore.Mvc.Controller
+public class QuestionController : Controller
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IMapper _mapper;
@@ -28,7 +28,9 @@ public class QuestionController : Microsoft.AspNetCore.Mvc.Controller
     {
         var questions = _mapper.Map<List<QuestionDto>>( _questionRepository.GetQuestionsWithCorrectAnswers());
         if (!ModelState.IsValid)
+        {
             return BadRequest(ModelState);
+        }
         return Ok(questions);
     }
 

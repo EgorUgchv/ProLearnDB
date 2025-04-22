@@ -1,24 +1,31 @@
 using ProLearnDB.Data;
+using ProLearnDB.Dto;
+using ProLearnDB.Exception;
 using ProLearnDB.Interfaces;
 using ProLearnDB.Models;
 
 namespace ProLearnDB.Repository;
 
-public class TestTitleRepository : ITestTitleRepository
+public class TestTitleRepository(ProLearnDbContext context, IQuestionRepository questionRepository)
+    : ITestTitleRepository
 {
-    private readonly ProLearnDbContext _context;
-
-    public TestTitleRepository(ProLearnDbContext context)
+    public ICollection<TestTitle> GetTestTitles()
     {
-        _context = context;
+        return context.TestTitles.OrderBy(p => p.TestTitleId).ToList();
     }
 
     /// <summary>
-    /// Все заголовки тестов
+    ///  Тест соответствующий переданному Id
     /// </summary>
-    /// <returns>Коллекция всех заголовков тестов</returns>
-    public ICollection<TestTitle> GetTestTitles()
+    /// <param name="testTitleId">Id теста</param>
+    /// <returns>Коллекция вопросов, которая относится к переданному Id теста</returns>
+    public ICollection<QuestionDto> GetTestByTestTitleId(int testTitleId)
     {
-        return _context.TestTitles.OrderBy(p => p.TestTitleId).ToList();
+        return questionRepository.GetQuestionsByTestTitleId(testTitleId);
+    }
+
+    public bool TestTitleExists(int testTitleId)
+    {
+        return context.Questions.Any(t => t.TestTitleId == testTitleId);
     }
 }
