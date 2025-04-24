@@ -15,4 +15,7 @@ public interface IQuestionRepository
     
     bool QuestionExists(int questionId);
     bool TestTitleExists(int testTitleId);
+
+    bool CreateQuestion(QuestionDto questionDto);
+    bool Save();
 }

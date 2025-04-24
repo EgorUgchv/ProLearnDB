@@ -9,6 +9,10 @@ public class MappingProfiles: Profile
     public MappingProfiles()
     {
         CreateMap<Question, QuestionDto>();
+        CreateMap<QuestionDto, Question>()
+            .ForMember(x => x.CorrectAnswer, opt =>opt.Ignore());
         CreateMap<TestTitle,TestTitleDto>();
+        CreateMap<User,UserDto>();
+        CreateMap<UserDto,User>();
     } 
 }

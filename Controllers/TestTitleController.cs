@@ -19,6 +19,10 @@ public class TestTitleController : Controller
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Все заголовки тестов 
+    /// </summary>
+    /// <returns>Все заголовки тестов и их Id</returns>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<Question>))]
     public IActionResult GetTestTitles()
@@ -32,7 +36,11 @@ public class TestTitleController : Controller
         return Ok(titles);
     }
 
-
+    /// <summary>
+    /// Тест, который соответсвует заданному Id
+    /// </summary>
+    /// <param name="testTitleId">Id требуемого теста</param>
+    /// <returns>Тест, который соответствует заданному Id</returns>
     [HttpGet("{testTitleId:int}")]
     [ProducesResponseType(200, Type = typeof(Question))]
     [ProducesResponseType(400)]
@@ -44,7 +52,7 @@ public class TestTitleController : Controller
         }
 
         var test = _mapper.Map<List<QuestionDto>>(_testTitleRepository.GetTestByTestTitleId(testTitleId));
-        
+
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         return Ok(test);

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
@@ -26,8 +27,7 @@ public class QuestionController : Controller
     [ProducesResponseType(200, Type = typeof(IEnumerable<Question>))]
     public IActionResult GetQuestionsWithCorrectAnswers()
     {
-        var questions = _mapper.Map<List<QuestionDto>>( _questionRepository.GetQuestionsWithCorrectAnswers());
-        if (!ModelState.IsValid)
+        var questions = _mapper.Map<List<QuestionDto>>( _questionRepository.GetQuestionsWithCorrectAnswers()); if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
@@ -46,5 +46,25 @@ public class QuestionController : Controller
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         return Ok(question);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public IActionResult CreateQuestion([FromBody] QuestionDto questionCreate)
+    {
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!_questionRepository.CreateQuestion(questionCreate))
+        {
+            ModelState.AddModelError("","Something went wrong while saving");
+            return StatusCode(500, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }

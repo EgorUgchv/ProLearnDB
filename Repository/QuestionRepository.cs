@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using ProLearnDB.Data;
@@ -8,15 +9,8 @@ using ProLearnDB.Models;
 
 namespace ProLearnDB.Repository;
 
-public class QuestionRepository : IQuestionRepository
+public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQuestionRepository
 {
-    private readonly ProLearnDbContext _context;
-
-    public QuestionRepository(ProLearnDbContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Все вопросы в тестах с верными ответами
     /// </summary>
@@ -24,7 +18,7 @@ public class QuestionRepository : IQuestionRepository
     public ICollection<QuestionDto> GetQuestionsWithCorrectAnswers()
     {
         // return _context.Questions.OrderBy(p => p.QuestionId).Join().ToList();
-        return _context.Questions
+        return context.Questions
             .Include(q => q.CorrectAnswer)
             .OrderBy(q => q.QuestionId)
             .Select(q => new QuestionDto
@@ -49,7 +43,7 @@ public class QuestionRepository : IQuestionRepository
     /// <returns>Вопрос, соответствующий переданному id</returns>
     public QuestionDto? GetQuestion(int questionId)
     {
-        return _context.Questions
+        return context.Questions
             .Include(q => q.CorrectAnswer)
             .Where(q => q.QuestionId == questionId)
             .Select(q => new QuestionDto
@@ -74,7 +68,7 @@ public class QuestionRepository : IQuestionRepository
     /// <returns>Коллекция вопросов, которая относится к переданному Id теста</returns>
     public ICollection<QuestionDto> GetQuestionsByTestTitleId(int testTitleId)
     {
-        return _context.Questions.Where(q => q.TestTitleId == testTitleId)
+        return context.Questions.Where(q => q.TestTitleId == testTitleId)
             .Include(q => q.CorrectAnswer)
             .OrderBy(q => q.QuestionId)
             .Select(q => new QuestionDto
@@ -93,11 +87,26 @@ public class QuestionRepository : IQuestionRepository
 
     public bool QuestionExists(int questionId)
     {
-        return _context.Questions.Any(q => q.QuestionId == questionId);
+        return context.Questions.Any(q => q.QuestionId == questionId);
     }
 
     public bool TestTitleExists(int testTitleId)
     {
-        return _context.Questions.Any(q => q.TestTitleId == testTitleId);
+        return context.Questions.Any(q => q.TestTitleId == testTitleId);
+    }
+
+    public bool CreateQuestion(QuestionDto questionDto)
+    {
+        var correctAnswer = context.CorrectAnswers
+            .FirstOrDefault(a => a.Answer != null && a.Answer.Equals(questionDto.CorrectAnswer));
+        context.Add(mapper.Map<Question>(questionDto));
+        
+        return Save();
+    }
+
+    public bool Save()
+    {
+        var saved = context.SaveChanges();
+        return saved > 0 ? true : false;
     }
 }
