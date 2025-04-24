@@ -10,6 +10,10 @@ namespace ProLearnDB.Controllers;
 [ApiController]
 public class UserController(IUserRepository userRepository, IMapper mapper) : Controller
 {
+    /// <summary>
+    /// Получение списка пользователей
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
     public IActionResult GetUsers()
@@ -22,7 +26,11 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
 
         return Ok(users);
     }
-
+/// <summary>
+/// Создание пользователя и его прогресса
+/// </summary>
+/// <param name="userCreate">Данные пользователя</param>
+/// <returns></returns>
     [HttpPost]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]

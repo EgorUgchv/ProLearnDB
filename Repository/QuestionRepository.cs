@@ -17,7 +17,6 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
     /// <returns>Коллекция всех вопросов с верными ответами</returns>
     public ICollection<QuestionDto> GetQuestionsWithCorrectAnswers()
     {
-        // return _context.Questions.OrderBy(p => p.QuestionId).Join().ToList();
         return context.Questions
             .Include(q => q.CorrectAnswer)
             .OrderBy(q => q.QuestionId)
@@ -59,6 +58,12 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
                 CorrectAnswer = q.CorrectAnswer.Answer
             })
             .FirstOrDefault();
+    }
+
+    public bool CreateQuestions(IEnumerable<Question> questions)
+    {
+       context.Questions.AddRange(questions);
+       return Save();
     }
 
     /// <summary>

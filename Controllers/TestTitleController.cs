@@ -1,24 +1,18 @@
+using System.Collections.ObjectModel;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
 using ProLearnDB.Models;
+using ProLearnDB.Repository;
 
 namespace ProLearnDB.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class TestTitleController : Controller
+public class TestTitleController(ITestTitleRepository testTitleRepository, IMapper mapper,IQuestionRepository questionRepository) : Controller
 {
-    private readonly ITestTitleRepository _testTitleRepository;
-    private readonly IMapper _mapper;
-
-    public TestTitleController(ITestTitleRepository testTitleRepository, IMapper mapper)
-    {
-        _testTitleRepository = testTitleRepository;
-        _mapper = mapper;
-    }
-
     /// <summary>
     /// Все заголовки тестов 
     /// </summary>
@@ -27,7 +21,7 @@ public class TestTitleController : Controller
     [ProducesResponseType(200, Type = typeof(IEnumerable<Question>))]
     public IActionResult GetTestTitles()
     {
-        var titles = _mapper.Map<List<TestTitleDto>>(_testTitleRepository.GetTestTitles());
+        var titles = mapper.Map<List<TestTitleDto>>(testTitleRepository.GetTestTitles());
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -46,15 +40,60 @@ public class TestTitleController : Controller
     [ProducesResponseType(400)]
     public IActionResult GetTestByTestTitleId(int testTitleId)
     {
-        if (!_testTitleRepository.TestTitleExists(testTitleId))
+        if (!testTitleRepository.TestTitleExists(testTitleId))
         {
             return NotFound();
         }
 
-        var test = _mapper.Map<List<QuestionDto>>(_testTitleRepository.GetTestByTestTitleId(testTitleId));
+        var test = mapper.Map<List<QuestionDto>>(testTitleRepository.GetTestByTestTitleId(testTitleId));
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         return Ok(test);
     }
+
+    // [HttpPost]
+    // [ProducesResponseType(204)]
+    // [ProducesResponseType(400)]
+    // public IActionResult CreateTest([FromBody] TestDto testCreate)
+    // {
+    //     var test = testTitleRepository.GetTestTitles()
+    //         .FirstOrDefault(u => u.Title.Equals(testCreate.Title));
+    //     if (test != null)
+    //     {
+    //         ModelState.AddModelError("", "Test already exists");
+    //         return StatusCode(422, ModelState);
+    //     }
+    //
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     TestTitleDto testTitleDto = new TestTitleDto
+    //     {
+    //         TestTitleId = testCreate.TestTitleId,
+    //         Title = testCreate.Title
+    //     };
+    //     
+    //     IEnumerable<Question> questions = testCreate.Questions
+    //         .Select(question => new Question
+    //         {
+    //              QuestionId = question.QuestionId,
+    //                  TestTitleId = question.TestTitleId,
+    //                  CorrectAnswerId = question.CorrectAnswerId,
+    //                  Issue = question.Issue,
+    //                  IssueChoice1 = question.IssueChoice1,
+    //                  IssueChoice2 = question.IssueChoice2,
+    //                  IssueChoice3 = question.IssueChoice3,
+    //                  IssueChoice4 = question.IssueChoice4, 
+    //                  
+    //         });
+    //     
+    //     if (!questionRepository.CreateQuestions(testCreate.Questions))
+    //     {
+    //         ModelState.AddModelError("","Something went wrong while saving");
+    //         return StatusCode(500, ModelState);
+    //     }
+    // }
 }

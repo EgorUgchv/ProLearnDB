@@ -33,7 +33,11 @@ public class QuestionController : Controller
         }
         return Ok(questions);
     }
-
+/// <summary>
+/// Получение вопроса по Id
+/// </summary>
+/// <param name="questionId">Id необходимого вопроса</param>
+/// <returns></returns>
     [HttpGet("{questionId}")]
     [ProducesResponseType(200, Type = typeof(Question))]
     [ProducesResponseType(400)]
@@ -47,7 +51,11 @@ public class QuestionController : Controller
             return BadRequest(ModelState);
         return Ok(question);
     }
-
+/// <summary>
+/// Создание вопроса
+/// </summary>
+/// <param name="questionCreate">Данные вопроса, которого необходимо создать</param>
+/// <returns></returns>
     [HttpPost]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
