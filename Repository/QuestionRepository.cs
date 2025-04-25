@@ -62,6 +62,7 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
 
     public bool CreateQuestions(IEnumerable<Question> questions)
     {
+        
        context.Questions.AddRange(questions);
        return Save();
     }

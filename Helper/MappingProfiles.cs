@@ -12,6 +12,7 @@ public class MappingProfiles: Profile
         CreateMap<QuestionDto, Question>()
             .ForMember(x => x.CorrectAnswer, opt =>opt.Ignore());
         CreateMap<TestTitle,TestTitleDto>();
+        CreateMap<TestTitleDto,TestTitle>();
         CreateMap<User,UserDto>();
         CreateMap<UserDto,User>();
     } 

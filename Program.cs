@@ -13,6 +13,7 @@ builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<ITestTitleRepository, TestTitleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserProgressRepository, UserProgressRepository>();
+builder.Services.AddScoped<ICorrectAnswerRepository, CorrectAnswerRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //Register DbContext
