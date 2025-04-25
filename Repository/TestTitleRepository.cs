@@ -24,7 +24,12 @@ public class TestTitleRepository(ProLearnDbContext context, IQuestionRepository 
     {
         return questionRepository.GetQuestionsByTestTitleId(testTitleId);
     }
-    
+
+    public TestTitle? GetTestTitleByTitle(string testTitle)
+    {
+        return context.TestTitles.FirstOrDefault(t => t != null && t.Title.Equals(testTitle));
+    }
+
     public bool CreateTestTitle(TestTitle testTitle)
     {
         context.Add(testTitle);

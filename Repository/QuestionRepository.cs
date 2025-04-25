@@ -22,9 +22,6 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
             .OrderBy(q => q.QuestionId)
             .Select(q => new QuestionDto
             {
-                QuestionId = q.QuestionId,
-                TestTitleId = q.TestTitleId,
-                CorrectAnswerId = q.CorrectAnswerId,
                 Issue = q.Issue,
                 IssueChoice1 = q.IssueChoice1,
                 IssueChoice2 = q.IssueChoice2,
@@ -47,9 +44,6 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
             .Where(q => q.QuestionId == questionId)
             .Select(q => new QuestionDto
             {
-                QuestionId = q.QuestionId,
-                TestTitleId = q.TestTitleId,
-                CorrectAnswerId = q.CorrectAnswerId,
                 Issue = q.Issue,
                 IssueChoice1 = q.IssueChoice1,
                 IssueChoice2 = q.IssueChoice2,
@@ -79,9 +73,6 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
             .OrderBy(q => q.QuestionId)
             .Select(q => new QuestionDto
             {
-                QuestionId = q.QuestionId,
-                TestTitleId = q.TestTitleId,
-                CorrectAnswerId = q.CorrectAnswerId,
                 Issue = q.Issue,
                 IssueChoice1 = q.IssueChoice1,
                 IssueChoice2 = q.IssueChoice2,
@@ -101,11 +92,9 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
         return context.Questions.Any(q => q.TestTitleId == testTitleId);
     }
 
-    public bool CreateQuestion(QuestionDto questionDto)
+    public bool CreateQuestion(Question question)
     {
-        var correctAnswer = context.CorrectAnswers
-            .FirstOrDefault(a => a.Answer != null && a.Answer.Equals(questionDto.CorrectAnswer));
-        context.Add(mapper.Map<Question>(questionDto));
+        context.Questions.Add(question);
         
         return Save();
     }

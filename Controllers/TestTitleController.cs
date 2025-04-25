@@ -13,7 +13,11 @@ namespace ProLearnDB.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class TestTitleController(ITestTitleRepository testTitleRepository, IMapper mapper,IQuestionRepository questionRepository, ICorrectAnswerRepository correctAnswerRepository) : Controller
+public class TestTitleController(
+    ITestTitleRepository testTitleRepository,
+    IMapper mapper,
+    IQuestionRepository questionRepository,
+    ICorrectAnswerRepository correctAnswerRepository) : Controller
 {
     /// <summary>
     /// Все заголовки тестов 
@@ -53,10 +57,10 @@ public class TestTitleController(ITestTitleRepository testTitleRepository, IMapp
             return BadRequest(ModelState);
         return Ok(test);
     }
+
     [HttpPost]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-[SwaggerRequestExample(typeof(TestDto),typeof(TestDtoRequestExample))]
     public IActionResult CreateTest([FromBody] TestDto testCreate)
     {
         var test = testTitleRepository.GetTestTitles()
@@ -66,51 +70,61 @@ public class TestTitleController(ITestTitleRepository testTitleRepository, IMapp
             ModelState.AddModelError("", "Test already exists");
             return StatusCode(422, ModelState);
         }
-    
+
+        if (!testCreate.Questions.Any())
+        {
+            ModelState.AddModelError("Questions", "At least one question is required");
+            return BadRequest(ModelState);
+        }
+
+        if (testCreate.Title == null)
+        {
+            ModelState.AddModelError("Title", "Input title");
+            return BadRequest(ModelState);
+        }
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-    if (testCreate.Questions == null || !testCreate.Questions.Any())
-    {
-        ModelState.AddModelError("Questions", "At least one question is required");
-        return BadRequest(ModelState);
-    }
-        TestTitleDto testTitleDto = new TestTitleDto
+
+        var testTitleDto = new TestTitleDto
         {
-            TestTitleId = testCreate.TestTitleId,
             Title = testCreate.Title
         };
         var testTitleMap = mapper.Map<TestTitle>(testTitleDto);
         if (!testTitleRepository.CreateTestTitle(testTitleMap))
         {
-            ModelState.AddModelError("","Something went wrong while saving test title");
+            ModelState.AddModelError("", "Something went wrong while saving test title");
             return StatusCode(500, ModelState);
         }
-        IEnumerable<Question> questions = testCreate.Questions
+
+        var questions = testCreate.Questions
             .Select(question =>
             {
                 if (question.CorrectAnswer != null)
+                {
+                    var correctAnswer = correctAnswerRepository.GetCorrectAnswer(question.CorrectAnswer);
                     return new Question
                     {
-                        QuestionId = question.QuestionId,
-                        TestTitleId = question.TestTitleId,
-                        CorrectAnswerId = question.CorrectAnswerId,
+                        CorrectAnswerId = correctAnswer.CorrectAnswerId,
+                        TestTitleId = testTitleMap.TestTitleId,
                         Issue = question.Issue,
                         IssueChoice1 = question.IssueChoice1,
                         IssueChoice2 = question.IssueChoice2,
                         IssueChoice3 = question.IssueChoice3,
                         IssueChoice4 = question.IssueChoice4,
-                        CorrectAnswer = correctAnswerRepository.GetCorrectAnswerId(question.CorrectAnswer),
+                        CorrectAnswer = correctAnswer,
                         TestTitle = testTitleMap
                     };
-                throw new ArgumentNullException("", "Correct answer field is null");
-                //TODO: finalize the method
+                }
+
+                throw new ArgumentNullException(nameof(testCreate), "Correct answer field is null");
             });
-        
+
         if (!questionRepository.CreateQuestions(questions))
         {
-            ModelState.AddModelError("","Something went wrong while saving questions");
+            ModelState.AddModelError("", "Something went wrong while saving questions");
             return StatusCode(500, ModelState);
         }
 

@@ -16,6 +16,10 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
     public bool CreateUser(User user)
     {
         context.Add(user);
+        if (Save() == false)
+        {
+            throw new InvalidOperationException("Failed to create user");
+        }
         if (!userProgressRepository.CreateUserProgress(user))
         {
             throw new InvalidOperationException("Failed to create user progress");

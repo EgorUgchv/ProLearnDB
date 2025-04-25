@@ -5,7 +5,6 @@ namespace ProLearnDB.Models;
 
 public class User
 {
-    
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int UserId { get; set; }
     [MaxLength(200)]

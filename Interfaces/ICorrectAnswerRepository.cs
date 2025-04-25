@@ -4,5 +4,7 @@ namespace ProLearnDB.Interfaces;
 
 public interface ICorrectAnswerRepository
 {
-    CorrectAnswer GetCorrectAnswerId(string correctAnswer);
+    CorrectAnswer GetCorrectAnswer(string correctAnswer);
+    bool DeleteAnswer(CorrectAnswer correctAnswer);
+    bool Save();
 }

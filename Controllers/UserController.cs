@@ -37,7 +37,7 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
     public IActionResult CreateUser([FromBody] UserDto userCreate)
     {
         var user = userRepository
-            .GetUsers().FirstOrDefault(u => u.UserId == userCreate.UserId);
+            .GetUsers().FirstOrDefault(u => u.PhoneNumber == userCreate.PhoneNumber);
         if (user != null)
         {
             ModelState.AddModelError("", "User already exists");
