@@ -12,7 +12,9 @@ namespace ProLearnDB.Controllers;
 public class UserController(
     IUserRepository userRepository,
     IMapper mapper,
-    IUserProgressRepository userProgressRepository) : Controller
+    IUserProgressRepository userProgressRepository,
+    ITestTitleRepository testTitleRepository) : Controller
+
 {
     /// <summary>
     /// Получение списка пользователей
@@ -111,6 +113,28 @@ public class UserController(
         }
 
         return Ok("Successfully created");
+    }
+/// <summary>
+/// Помечает тест пройденным пользователем
+/// </summary>
+/// <param name="phoneNumber">Номер телефона пользователя</param>
+/// <param name="testTitle">Заголовок теста, который необходимо пометить как пройденный </param>
+/// <returns></returns>
+    [HttpPatch("{phoneNumber},{testTitle}")]
+    public IActionResult SetTestCompleted(string? phoneNumber, string? testTitle)
+    {
+        var userId = userRepository.GetUserByPhoneNumber(phoneNumber).UserId;
+        var testTitleId = testTitleRepository.GetTestTitleByTitle(testTitle).TestTitleId;
+        if (userProgressRepository.UserProgressExist(userId,testTitleId) == false)
+        {
+            ModelState.AddModelError("", "User progress not exist");
+            return BadRequest(ModelState);
+        }
+
+        if (userProgressRepository.SetTestCompleted(userId, testTitleId)) return Ok("Successfully update progress");
+        ModelState.AddModelError("", "Something went wrong while update progress");
+        return StatusCode(500, ModelState);
+
     }
 
 

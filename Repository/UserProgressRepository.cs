@@ -23,7 +23,7 @@ public class UserProgressRepository(ProLearnDbContext context, ITestTitleReposit
 
         var countCompletedTests = context.UserProgresses.Count(u => u.UserId == userId && u.IsCompleted == true);
         var progress = (double)countCompletedTests / totalTest * 100;
-        return (int)Math.Round(progress,0);
+        return (int)Math.Round(progress, 0);
     }
 
     public bool CreateUserProgress(User user)
@@ -43,6 +43,20 @@ public class UserProgressRepository(ProLearnDbContext context, ITestTitleReposit
             });
         context.UserProgresses.AddRange(userProgresses);
         return Save();
+    }
+
+    public bool SetTestCompleted(int userId, int testTitleId)
+    {
+        var userProgress =
+            context.UserProgresses.FirstOrDefault(p => p.UserId == userId && p.TestTitleId == testTitleId);
+        if (userProgress == null || userProgress.IsCompleted) return false;
+        userProgress.IsCompleted = true;
+        return Save();
+    }
+
+    public bool UserProgressExist(int userId, int testTitleId)
+    {
+        return context.UserProgresses.Any(p => p.TestTitleId == testTitleId && p.UserId == userId);
     }
 
     public bool Save()
