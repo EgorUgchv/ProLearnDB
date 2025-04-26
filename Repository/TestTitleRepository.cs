@@ -25,6 +25,16 @@ public class TestTitleRepository(ProLearnDbContext context, IQuestionRepository 
         return questionRepository.GetQuestionsByTestTitleId(testTitleId);
     }
 
+    /// <summary>
+    ///  Тест соответствующий переданному заголовку теста
+    /// </summary>
+    /// <param name="testTitle">заголовок теста</param>
+    /// <returns>Коллекция вопросов, которая относится к переданному заголовку теста</returns>
+    public ICollection<QuestionDto> GetTestByTestTitle(string testTitle)
+    {
+        return questionRepository.GetQuestionsByTestTitle(testTitle);
+    }
+    
     public TestTitle? GetTestTitleByTitle(string testTitle)
     {
         return context.TestTitles.FirstOrDefault(t => t != null && t.Title.Equals(testTitle));

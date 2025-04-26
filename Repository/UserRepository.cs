@@ -12,6 +12,11 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
         return context.Users.OrderBy(u => u.UserId).ToList();
     }
 
+    public User? GetUserByPhoneNumber(string phoneNumber)
+    {
+        return context.Users.FirstOrDefault(u =>u != null && u.PhoneNumber != null && u.PhoneNumber.Equals(phoneNumber));
+    }
+
 
     public bool CreateUser(User user)
     {
@@ -27,9 +32,15 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
         return true;
     }
 
+    public bool UserExists(string phoneNumber)
+    {
+        return context.Users.Any(q => q.PhoneNumber != null && q.PhoneNumber.Equals(phoneNumber));
+    }
+    
     public bool Save()
     {
         var saved = context.SaveChanges();
         return saved > 0 ? true : false;
     }
+
 }

@@ -7,5 +7,7 @@ public interface IUserRepository
 {
      bool CreateUser(User user);
     ICollection<User> GetUsers();
+    User? GetUserByPhoneNumber(string phoneNumber);
     bool Save();
+    bool UserExists(string phoneNumber);
 }

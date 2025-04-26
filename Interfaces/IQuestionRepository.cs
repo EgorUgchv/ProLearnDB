@@ -12,6 +12,7 @@ public interface IQuestionRepository
 
    
     ICollection<QuestionDto> GetQuestionsByTestTitleId(int testTitleId);
+    ICollection<QuestionDto> GetQuestionsByTestTitle(string testTitle);
     
     bool QuestionExists(int questionId);
     bool TestTitleExists(int testTitleId);

@@ -82,6 +82,12 @@ public class QuestionRepository(ProLearnDbContext context, IMapper mapper) : IQu
             }).ToList();
     }
 
+    public ICollection<QuestionDto> GetQuestionsByTestTitle(string testTitle)
+    {
+        int testTitleId = context.TestTitles.FirstOrDefault(t => t != null && t.Title.Equals(testTitle)).TestTitleId;
+        return GetQuestionsByTestTitleId(testTitleId);
+    }
+
     public bool QuestionExists(int questionId)
     {
         return context.Questions.Any(q => q.QuestionId == questionId);

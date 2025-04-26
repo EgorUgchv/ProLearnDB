@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
@@ -27,10 +28,33 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
         return Ok(users);
     }
 /// <summary>
-/// Создание пользователя и его прогресса
+///  Получение пользователя по номеру телефона
 /// </summary>
-/// <param name="userCreate">Данные пользователя</param>
+/// <param name="phoneNumber">Номер телефона</param>
 /// <returns></returns>
+    [HttpGet("{phoneNumber}")]
+    [ProducesResponseType(200, Type = typeof(User))]
+    public IActionResult GetUserByPhoneNumber(string phoneNumber)
+    {
+        if (!userRepository.UserExists(phoneNumber))
+        {
+            return NotFound();
+        }
+
+        var user = mapper.Map<UserDto>(userRepository.GetUserByPhoneNumber(phoneNumber));
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Ok(user);
+    }
+    
+    /// <summary>
+    /// Создание пользователя и его прогресса
+    /// </summary>
+    /// <param name="userCreate">Данные пользователя</param>
+    /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
@@ -58,4 +82,28 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
 
         return Ok("Successfully created");
     }
+
+
+    // [HttpDelete("{phoneNumber}")]
+    // [ProducesResponseType(400)]
+    // [ProducesResponseType(204)]
+    // [ProducesResponseType(404)]
+    // public IActionResult DeleteUser(string phoneNumber)
+    // {
+    //     if (!userRepository.UserExists(phoneNumber))
+    //         return NotFound();
+    //
+    //     var userToDelete = userRepository.GetUserByPhoneNumber(phoneNumber);
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     if (userRepository.DeleteUser(userToDelete))
+    //     {
+    //        ModelState.AddModelError("","Something went wrong while deleting user"); 
+    //     }
+    //
+    //     return NoContent();
+    // }
 }

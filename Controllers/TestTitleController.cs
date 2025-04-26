@@ -58,6 +58,29 @@ public class TestTitleController(
         return Ok(test);
     }
 
+    /// <summary>
+    /// Тест, который соответсвует заданному test title
+    /// </summary>
+    /// <param name="testTitle"></param>
+    /// <returns>Тест, который соответствует заданному Id</returns>
+    [HttpGet("{testTitle}")]
+    [ProducesResponseType(200, Type = typeof(Question))]
+    [ProducesResponseType(400)]
+    public IActionResult GetTestByTestTitle(string? testTitle)
+    {
+        if (testTitle == null)
+        {
+            ModelState.AddModelError("", "Input test Title");
+            return BadRequest(ModelState);
+        }
+
+        var test = mapper.Map<List<QuestionDto>>(questionRepository.GetQuestionsByTestTitle(testTitle));
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        return Ok(test);
+    }
+
     [HttpPost]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
