@@ -9,7 +9,10 @@ namespace ProLearnDB.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class UserController(IUserRepository userRepository, IMapper mapper) : Controller
+public class UserController(
+    IUserRepository userRepository,
+    IMapper mapper,
+    IUserProgressRepository userProgressRepository) : Controller
 {
     /// <summary>
     /// Получение списка пользователей
@@ -17,6 +20,7 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+    [ProducesResponseType(400)]
     public IActionResult GetUsers()
     {
         var users = mapper.Map<List<UserDto>>(userRepository.GetUsers());
@@ -27,13 +31,15 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
 
         return Ok(users);
     }
-/// <summary>
-///  Получение пользователя по номеру телефона
-/// </summary>
-/// <param name="phoneNumber">Номер телефона</param>
-/// <returns></returns>
+
+    /// <summary>
+    ///  Получение пользователя по номеру телефона
+    /// </summary>
+    /// <param name="phoneNumber">Номер телефона</param>
+    /// <returns></returns>
     [HttpGet("{phoneNumber}")]
     [ProducesResponseType(200, Type = typeof(User))]
+    [ProducesResponseType(400)]
     public IActionResult GetUserByPhoneNumber(string phoneNumber)
     {
         if (!userRepository.UserExists(phoneNumber))
@@ -49,7 +55,31 @@ public class UserController(IUserRepository userRepository, IMapper mapper) : Co
 
         return Ok(user);
     }
-    
+
+    /// <summary>
+    /// Получение прогресса пользователя в процентах
+    /// </summary>
+    /// <param name="phoneNumber">Номер телефона пользователя</param>
+    /// <returns>Номер телефона и прогресс пользователя в процентах</returns>
+    [HttpGet("{phoneNumber}/userProgress")]
+    [ProducesResponseType(200, Type = typeof(int))]
+    [ProducesResponseType(400)]
+    public IActionResult GetUserProgressByPhoneNumber(string phoneNumber)
+    {
+        if (!userRepository.UserExists(phoneNumber))
+        {
+            return NotFound();
+        }
+
+        var userId = userRepository.GetUserByPhoneNumber(phoneNumber)?.UserId;
+        UserProgressInPercentDto userProgress = new UserProgressInPercentDto
+        {
+            PhoneNumber = phoneNumber,
+            UserProgressInPercent = userProgressRepository.GetUserProgressInPercent(userId)
+        };
+        return Ok(userProgress);
+    }
+
     /// <summary>
     /// Создание пользователя и его прогресса
     /// </summary>
