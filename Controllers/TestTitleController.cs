@@ -153,4 +153,29 @@ public class TestTitleController(
 
         return Ok("Successfully created");
     }
+
+    [HttpDelete("{testTitle}")]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public IActionResult DeleteTest(string testTitle)
+    {
+        if (!testTitleRepository.TestTitleExistsByTestTitle(testTitle))
+        {
+            return NotFound();
+        }
+
+        var testToDelete = testTitleRepository.GetTestTitleByTitle(testTitle);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        
+        
+        if (testToDelete == null || testTitleRepository.DeleteTest(testToDelete)) return Ok("Successfully deleted");
+        
+        ModelState.AddModelError("","Something went wrong while deleting user"); 
+        return StatusCode(500, ModelState);
+    }
 }

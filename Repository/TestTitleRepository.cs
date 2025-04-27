@@ -55,12 +55,23 @@ public class TestTitleRepository(ProLearnDbContext context, IQuestionRepository 
     /// <returns></returns>
     public bool TestTitleExists(int testTitleId)
     {
-        return context.Questions.Any(t => t.TestTitleId == testTitleId);
+        return context.TestTitles.Any(t => t != null && t.TestTitleId == testTitleId);
+    }
+
+    public bool TestTitleExistsByTestTitle(string testTitle)
+    {
+        return context.TestTitles.Any(t => t.Title != null && t.Title.Equals(testTitle));
     }
 
     public bool Save()
     {
         var saved = context.SaveChanges();
         return saved > 0 ? true : false;
+    }
+
+    public bool DeleteTest(TestTitle testToDelete)
+    {
+        context.Remove(testToDelete);
+        return Save();
     }
 }

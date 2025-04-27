@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ProLearnDB.Dto;
 using ProLearnDB.Interfaces;
 using ProLearnDB.Models;
@@ -114,18 +115,19 @@ public class UserController(
 
         return Ok("Successfully created");
     }
-/// <summary>
-/// Помечает тест пройденным пользователем
-/// </summary>
-/// <param name="phoneNumber">Номер телефона пользователя</param>
-/// <param name="testTitle">Заголовок теста, который необходимо пометить как пройденный </param>
-/// <returns></returns>
+
+    /// <summary>
+    /// Помечает тест пройденным пользователем
+    /// </summary>
+    /// <param name="phoneNumber">Номер телефона пользователя</param>
+    /// <param name="testTitle">Заголовок теста, который необходимо пометить как пройденный </param>
+    /// <returns></returns>
     [HttpPatch("{phoneNumber},{testTitle}")]
     public IActionResult SetTestCompleted(string? phoneNumber, string? testTitle)
     {
         var userId = userRepository.GetUserByPhoneNumber(phoneNumber).UserId;
         var testTitleId = testTitleRepository.GetTestTitleByTitle(testTitle).TestTitleId;
-        if (userProgressRepository.UserProgressExist(userId,testTitleId) == false)
+        if (userProgressRepository.UserProgressExist(userId, testTitleId) == false)
         {
             ModelState.AddModelError("", "User progress not exist");
             return BadRequest(ModelState);
@@ -134,30 +136,43 @@ public class UserController(
         if (userProgressRepository.SetTestCompleted(userId, testTitleId)) return Ok("Successfully update progress");
         ModelState.AddModelError("", "Something went wrong while update progress");
         return StatusCode(500, ModelState);
-
     }
 
+    
+    [HttpGet("{chatId:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public IActionResult CheckChatIdExists(int chatId)
+    {
+        if (chatId <= 0)
+        {
+            ModelState.AddModelError("", "Chat ID must be a positive non-null value.");
+            return BadRequest(ModelState);
+        }
 
-    // [HttpDelete("{phoneNumber}")]
-    // [ProducesResponseType(400)]
-    // [ProducesResponseType(204)]
-    // [ProducesResponseType(404)]
-    // public IActionResult DeleteUser(string phoneNumber)
-    // {
-    //     if (!userRepository.UserExists(phoneNumber))
-    //         return NotFound();
-    //
-    //     var userToDelete = userRepository.GetUserByPhoneNumber(phoneNumber);
-    //     if (!ModelState.IsValid)
-    //     {
-    //         return BadRequest(ModelState);
-    //     }
-    //
-    //     if (userRepository.DeleteUser(userToDelete))
-    //     {
-    //        ModelState.AddModelError("","Something went wrong while deleting user"); 
-    //     }
-    //
-    //     return NoContent();
-    // }
+        if (userRepository.CheckChatIdExists(chatId)) return NoContent();
+        return NotFound();
+    }
+    
+    
+    [HttpDelete("{phoneNumber}")]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public IActionResult DeleteUser(string phoneNumber)
+    {
+        if (!userRepository.UserExists(phoneNumber))
+            return NotFound();
+    
+        var userToDelete = userRepository.GetUserByPhoneNumber(phoneNumber);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (userToDelete == null || userRepository.DeleteUser(userToDelete)) return Ok("Successfully deleted");
+        ModelState.AddModelError("","Something went wrong while deleting user"); 
+        return StatusCode(500, ModelState);
+
+    }
 }

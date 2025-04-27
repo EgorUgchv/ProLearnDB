@@ -10,5 +10,7 @@ public interface ITestTitleRepository
     TestTitle? GetTestTitleByTitle(string testTitle);
     public bool CreateTestTitle(TestTitle testTitle);
     bool TestTitleExists(int testTitleId);
+    bool TestTitleExistsByTestTitle(string testTitle);
     public bool Save();
+    bool DeleteTest(TestTitle testToDelete);
 }

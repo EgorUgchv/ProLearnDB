@@ -84,7 +84,6 @@ public class QuestionController(
         ModelState.AddModelError("", "Input testTitle or correctAnswer field");
         return BadRequest(ModelState);
     }
-
     private void FillTestTitleAndCorrectAnswerInQuestionMap(Question questionMap, string testTitle,
         QuestionDto questionCreate)
     {

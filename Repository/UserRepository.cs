@@ -17,7 +17,6 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
         return context.Users.FirstOrDefault(u =>u != null && u.PhoneNumber != null && u.PhoneNumber.Equals(phoneNumber));
     }
 
-
     public bool CreateUser(User user)
     {
         context.Add(user);
@@ -32,11 +31,21 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
         return true;
     }
 
+    public bool DeleteUser(User user)
+    {
+        context.Remove(user);
+        return Save();
+    }
     public bool UserExists(string phoneNumber)
     {
         return context.Users.Any(q => q.PhoneNumber != null && q.PhoneNumber.Equals(phoneNumber));
     }
-    
+
+    public bool CheckChatIdExists(int chatId)
+    {
+        return context.Users.Any(u => u != null && u.ChatId == chatId);
+    }
+
     public bool Save()
     {
         var saved = context.SaveChanges();
