@@ -143,24 +143,40 @@ public class UserController(
     }
 
     /// <summary>
-    /// Проверка существования пользователя по chat id, который присваевается пользователю telegram ботом 
+    /// Получение пользователя по chat id, который присваивается пользователю telegram ботом
     /// </summary>
-    /// <param name="chatId">Сhat id пользователя </param>
-    /// <returns></returns>
-    [HttpGet("{chatId:int}")]
-    [ProducesResponseType(204)]
+    /// <param name="chatId">Chat id пользователя</param>
+    /// <returns>Информация о пользователе</returns>
+    [HttpGet("{chatId:long}/userInfo")]
+    [ProducesResponseType(200, Type = typeof(UserProgressInPercentDto))]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public IActionResult CheckChatIdExists(int chatId)
+    public IActionResult GetUserByChatId(long chatId)
     {
-        if (chatId <= 0)
+        if ( chatId <= 0 )
         {
-            ModelState.AddModelError("", "Chat ID must be a positive non-null value.");
+            ModelState.AddModelError("", "Chat ID must be положительным числом.");
             return BadRequest(ModelState);
         }
 
-        if (userRepository.CheckChatIdExists(chatId)) return NoContent();
-        return NotFound();
+        var user = userRepository.GetUserByChatId(chatId);
+        if ( user == null )
+        {
+            return NotFound("User not found");
+        }
+
+        var userProgress = new UserProgressInPercentDto
+        {
+            ChatId = user.ChatId,
+            FullName = user.FullName,
+            PhoneNumber = user.PhoneNumber ?? "",
+            UserProgressInPercent = userProgressRepository.GetUserProgressInPercent(user.UserId)
+        };
+
+        return Ok(userProgress);
     }
+
+
 
 
     [HttpDelete("{phoneNumber}")]
