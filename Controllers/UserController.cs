@@ -63,7 +63,7 @@ public class UserController(
     /// Получение прогресса пользователя в процентах
     /// </summary>
     /// <param name="phoneNumber">Номер телефона пользователя</param>
-    /// <returns>Номер телефона и прогресс пользователя в процентах</returns>
+    /// <returns>Данные о пользователе и прогресс пользователя в процентах</returns>
     [HttpGet("{phoneNumber}/userProgress")]
     [ProducesResponseType(200, Type = typeof(int))]
     [ProducesResponseType(400)]
@@ -74,13 +74,17 @@ public class UserController(
             return NotFound();
         }
 
-        var userId = userRepository.GetUserByPhoneNumber(phoneNumber)?.UserId;
-        UserProgressInPercentDto userProgress = new UserProgressInPercentDto
+        var user = userRepository.GetUserByPhoneNumber(phoneNumber);
+        if (user == null) return NotFound("User not found");
+        var userProgress = new UserProgressInPercentDto
         {
+            ChatId = user.ChatId,
+            FullName = user.FullName,
             PhoneNumber = phoneNumber,
-            UserProgressInPercent = userProgressRepository.GetUserProgressInPercent(userId)
+            UserProgressInPercent = userProgressRepository.GetUserProgressInPercent(user?.UserId)
         };
         return Ok(userProgress);
+
     }
 
     /// <summary>
@@ -138,7 +142,11 @@ public class UserController(
         return StatusCode(500, ModelState);
     }
 
-    
+    /// <summary>
+    /// Проверка существования пользователя по chat id, который присваевается пользователю telegram ботом 
+    /// </summary>
+    /// <param name="chatId">Сhat id пользователя </param>
+    /// <returns></returns>
     [HttpGet("{chatId:int}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
@@ -153,8 +161,8 @@ public class UserController(
         if (userRepository.CheckChatIdExists(chatId)) return NoContent();
         return NotFound();
     }
-    
-    
+
+
     [HttpDelete("{phoneNumber}")]
     [ProducesResponseType(400)]
     [ProducesResponseType(204)]
@@ -163,7 +171,7 @@ public class UserController(
     {
         if (!userRepository.UserExists(phoneNumber))
             return NotFound();
-    
+
         var userToDelete = userRepository.GetUserByPhoneNumber(phoneNumber);
         if (!ModelState.IsValid)
         {
@@ -171,8 +179,7 @@ public class UserController(
         }
 
         if (userToDelete == null || userRepository.DeleteUser(userToDelete)) return Ok("Successfully deleted");
-        ModelState.AddModelError("","Something went wrong while deleting user"); 
+        ModelState.AddModelError("", "Something went wrong while deleting user");
         return StatusCode(500, ModelState);
-
     }
 }
