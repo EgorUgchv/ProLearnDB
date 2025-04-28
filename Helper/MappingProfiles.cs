@@ -15,5 +15,7 @@ public class MappingProfiles: Profile
         CreateMap<TestTitleDto,TestTitle>();
         CreateMap<User,UserDto>();
         CreateMap<UserDto,User>();
+        CreateMap<EducationDto,Education>();
+        CreateMap<Education,EducationDto>();
     } 
 }

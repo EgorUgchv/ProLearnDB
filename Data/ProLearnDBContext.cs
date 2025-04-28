@@ -17,6 +17,7 @@ public class ProLearnDbContext:DbContext
     public DbSet<User?> Users { get; set; }
     public DbSet<UserProgress> UserProgresses { get; set; }
     public DbSet<CorrectAnswer> CorrectAnswers { get; set; }
+    public DbSet<Education?> Education { get; set; }
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
    {
        //Set up database connection
@@ -43,6 +44,10 @@ public class ProLearnDbContext:DbContext
        
        modelBuilder.Entity<CorrectAnswer>()
            .Property(c => c.CorrectAnswerId)
+           .UseIdentityAlwaysColumn();
+       
+       modelBuilder.Entity<Education>()
+           .Property(c => c.EducationId)
            .UseIdentityAlwaysColumn();
    }
 }
