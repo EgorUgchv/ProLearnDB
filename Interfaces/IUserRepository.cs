@@ -12,5 +12,5 @@ public interface IUserRepository
     bool Save();
     bool UserExists(string phoneNumber);
     bool CheckChatIdExists(int chatId);
-    User? GetUserByChatId(long chatId);
+    User? GetUserByChatId(long? chatId);
 }

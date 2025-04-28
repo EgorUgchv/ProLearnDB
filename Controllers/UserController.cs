@@ -84,7 +84,6 @@ public class UserController(
             UserProgressInPercent = userProgressRepository.GetUserProgressInPercent(user?.UserId)
         };
         return Ok(userProgress);
-
     }
 
     /// <summary>
@@ -123,13 +122,15 @@ public class UserController(
     /// <summary>
     /// Помечает тест пройденным пользователем
     /// </summary>
-    /// <param name="phoneNumber">Номер телефона пользователя</param>
+    /// <param name="chatId">Chat ID пользователя</param>
     /// <param name="testTitle">Заголовок теста, который необходимо пометить как пройденный </param>
     /// <returns></returns>
-    [HttpPatch("{phoneNumber},{testTitle}")]
-    public IActionResult SetTestCompleted(string? phoneNumber, string? testTitle)
+    [HttpPatch("{chatId:int},{testTitle}")]
+    public IActionResult SetTestCompleted(long? chatId, string? testTitle)
     {
-        var userId = userRepository.GetUserByPhoneNumber(phoneNumber).UserId;
+        if (chatId is not > 0) return BadRequest("Chat ID must be a positive non-null value.");
+        var userId = userRepository.GetUserByChatId(chatId).UserId;
+
         var testTitleId = testTitleRepository.GetTestTitleByTitle(testTitle).TestTitleId;
         if (userProgressRepository.UserProgressExist(userId, testTitleId) == false)
         {
@@ -140,7 +141,9 @@ public class UserController(
         if (userProgressRepository.SetTestCompleted(userId, testTitleId)) return Ok("Successfully update progress");
         ModelState.AddModelError("", "Something went wrong while update progress");
         return StatusCode(500, ModelState);
+
     }
+
 
     /// <summary>
     /// Получение пользователя по chat id, который присваивается пользователю telegram ботом
@@ -153,14 +156,14 @@ public class UserController(
     [ProducesResponseType(404)]
     public IActionResult GetUserByChatId(long chatId)
     {
-        if ( chatId <= 0 )
+        if (chatId <= 0)
         {
             ModelState.AddModelError("", "Chat ID must be положительным числом.");
             return BadRequest(ModelState);
         }
 
         var user = userRepository.GetUserByChatId(chatId);
-        if ( user == null )
+        if (user == null)
         {
             return NotFound("User not found");
         }
@@ -175,8 +178,6 @@ public class UserController(
 
         return Ok(userProgress);
     }
-
-
 
 
     [HttpDelete("{phoneNumber}")]

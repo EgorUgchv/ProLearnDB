@@ -51,7 +51,7 @@ public class UserRepository(ProLearnDbContext context, IUserProgressRepository u
         var saved = context.SaveChanges();
         return saved > 0 ? true : false;
     }
-    public User? GetUserByChatId(long chatId)
+    public User? GetUserByChatId(long? chatId)
     {
         return context.Users.FirstOrDefault(u => u != null && u.ChatId == chatId);
     }
