@@ -4,7 +4,7 @@ namespace ProLearnDB.Interfaces;
 
 public interface IEducationRepository
 {
-    Education? GetEducationMaterialByTheme(string? theme);
+    List<Education?> GetEducationMaterialsByTheme(string? theme);
     bool CreateEducation(Education education);
     public bool Save();
 }

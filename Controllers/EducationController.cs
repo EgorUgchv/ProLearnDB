@@ -19,7 +19,7 @@ public class EducationController(
     [ProducesResponseType(400)]
     public IActionResult GetEducationData(string? theme)
     {
-        var educationMap = mapper.Map<EducationDto>(educationRepository.GetEducationMaterialByTheme(theme));
+        var educationMap = mapper.Map<List<EducationDto>>(educationRepository.GetEducationMaterialsByTheme(theme));
         if (educationMap == null)
         {
             return NotFound();

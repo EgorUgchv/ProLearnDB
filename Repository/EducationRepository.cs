@@ -7,9 +7,9 @@ namespace ProLearnDB.Repository;
 
 public class EducationRepository(ProLearnDbContext context): IEducationRepository
 {
-    public Education? GetEducationMaterialByTheme(string? theme)
+    public List<Education?> GetEducationMaterialsByTheme(string? theme)
     {
-        return context.Education.FirstOrDefault(e =>  e != null && e.Theme != null && e.Theme.Equals(theme));
+        return context.Education.Where(e =>  e != null && e.Theme != null && e.Theme.Equals(theme)).ToList();
     }
 
 
